@@ -7,7 +7,7 @@ namespace AHOYBackendAssessment.Models
 {
     public class Booking
     {
-        public int ID { get; set; }
+        public int BookingID { get; set; }
         public int CustomerID { get; set; }
         public int HotelID { get; set; }
         public DateTime CheckIn { get; set; }
