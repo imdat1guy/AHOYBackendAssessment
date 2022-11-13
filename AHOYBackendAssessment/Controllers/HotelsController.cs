@@ -77,23 +77,42 @@ namespace AHOYBackendAssessment.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new HotelListResponse() { Code = "Error", ErrorMessage = ex.Message, Hotels = new List<HotelSummary>() };
+                return new HotelListResponse() { Code = "Error", ErrorMessage = ex.Message };
             }
         }
 
         [Route("{ID}")]
         [HttpGet]
-        public string Get(int ID)
+        public HotelDetailsResponse Get(int ID)
         {
-            var rng = new Random();
-            //return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            //{
-            //    Date = DateTime.Now.AddDays(index),
-            //    TemperatureC = rng.Next(-20, 55),
-            //    Summary = Summaries[rng.Next(Summaries.Length)]
-            //})
-            //.ToArray();
-            return "ok";
+            try
+            {
+                //Query Hotel
+                var hotel = _context.Hotels.Where(i => i.HotelID == ID).Select(i => new HotelDetails
+                {
+                    Address = i.Address,
+                    City = i.City,
+                    Description = i.Description,
+                    Facilities = i.Facilities,
+                    HotelID = i.HotelID,
+                    Images = i.Images,
+                    Latitude = i.Latitude,
+                    Longitude = i.Longitude,
+                    Name = i.Name,
+                    NumberOfReviews = i.HotelReviews.Count(),
+                    PricePerNight = i.PricePerNight,
+                    Rating = i.Rating
+                }).FirstOrDefault();
+
+                //return details
+                return new HotelDetailsResponse() { Code = "Success", Hotel = hotel };
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return new HotelDetailsResponse() { Code = "Error", ErrorMessage = ex.Message };
+            }
+            
         }
     }
 }
