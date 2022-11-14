@@ -77,7 +77,7 @@ namespace AHOYBackendAssessment.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new HotelListResponse() { Code = "Error", ErrorMessage = ex.Message };
+                return new HotelListResponse() { Code = "Error", ErrorMessage = "Internal Server Error" };
             }
         }
 
@@ -110,7 +110,7 @@ namespace AHOYBackendAssessment.Controllers
             catch(Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new HotelDetailsResponse() { Code = "Error", ErrorMessage = ex.Message };
+                return new HotelDetailsResponse() { Code = "Error", ErrorMessage = "Internal Server Error" };
             }
             
         }
