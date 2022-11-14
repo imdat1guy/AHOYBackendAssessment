@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AHOYBackendAssessment.Models.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,7 +14,6 @@ namespace AHOYBackendAssessment.Models
         public float PricePerNight { get; set; }
         public List<Image> Images { get; set; }
         public string Thumbnail { get; set; }
-        public int NumberOfRooms { get; set; }
         public bool IsRecommended { get; set; }
         public string City { get; set; }
         public string Address { get; set; }
@@ -24,5 +24,7 @@ namespace AHOYBackendAssessment.Models
         //Average of ratings updated on addition of a review. redundancy for better querying
         public float Rating { get; set; }
         public ICollection<HotelReview> HotelReviews { get; set; }
+        public virtual ICollection<Room> Rooms { get; set; }
+        public virtual ICollection<Booking> Bookings { get; set; }
     }
 }

@@ -29,6 +29,7 @@ namespace AHOYBackendAssessment.Controllers
         /// <param name="batchNum">the number of the batch, or the page, to be retrieved</param>
         /// <param name="name">The name of the hotel</param>
         /// <param name="city">city of the hotel</param>
+        /// <param name="isRecommended">Recommended filter</param>
         /// <param name="minprice">minimum price</param>
         /// <param name="maxprice">maximum price</param>
         /// <param name="checkin">Check-in Date</param>
@@ -37,7 +38,7 @@ namespace AHOYBackendAssessment.Controllers
         /// <param name="maxrating">Maximum rating</param>
         /// <returns></returns>
         [HttpGet]
-        public HotelListResponse Get(int batchsize = 0, int batchNum = 0, string name = "", string city = "", float? minprice = null, float? maxprice = null, DateTime? checkin = null, DateTime? checkout = null, float? minrating = null, float? maxrating = null)
+        public ActionResult<IEnumerable<HotelSummary>> Get(int batchsize = 0, int batchNum = 0, string name = "", string city = "", bool? isRecommended = null, float? minprice = null, float? maxprice = null, DateTime? checkin = null, DateTime? checkout = null, float? minrating = null, float? maxrating = null)
         {
             try
             {
@@ -46,6 +47,7 @@ namespace AHOYBackendAssessment.Controllers
                 //query ddb for hotels with filters
                 IQueryable<HotelSummary> hotels = _context.Hotels.Where(i => (name == "" || i.Name.Contains(name))
                                                              && (city == "" || i.City == name)
+                                                             && (isRecommended == null || i.IsRecommended == isRecommended)
                                                              && (minprice == null || i.PricePerNight >= minprice)
                                                              && (maxprice == null || i.PricePerNight <= maxprice)
                                                              && (minrating == null || i.Rating >= minrating)
@@ -71,48 +73,47 @@ namespace AHOYBackendAssessment.Controllers
                     Results = hotels.ToList();
                 }
 
-                return new HotelListResponse() { Code = "Success", Hotels = Results };
+                return Results;
 
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                return new HotelListResponse() { Code = "Error", ErrorMessage = "Internal Server Error" };
+                return BadRequest();
             }
         }
 
-        [Route("{ID}")]
-        [HttpGet]
-        public HotelDetailsResponse Get(int ID)
+        /// <summary>
+        /// API to retrieve specific hotel details
+        /// </summary>
+        /// <param name="id">Hotel ID</param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public ActionResult<HotelDetails> GetHotel(int id)
         {
-            try
+            //Query Hotel
+            var hotel = _context.Hotels.Where(i => i.HotelID == id).Select(i => new HotelDetails
             {
-                //Query Hotel
-                var hotel = _context.Hotels.Where(i => i.HotelID == ID).Select(i => new HotelDetails
-                {
-                    Address = i.Address,
-                    City = i.City,
-                    Description = i.Description,
-                    Facilities = i.Facilities,
-                    HotelID = i.HotelID,
-                    Images = i.Images,
-                    Latitude = i.Latitude,
-                    Longitude = i.Longitude,
-                    Name = i.Name,
-                    NumberOfReviews = i.HotelReviews.Count(),
-                    PricePerNight = i.PricePerNight,
-                    Rating = i.Rating
-                }).FirstOrDefault();
+                Address = i.Address,
+                City = i.City,
+                Description = i.Description,
+                Facilities = i.Facilities,
+                HotelID = i.HotelID,
+                Images = i.Images,
+                Latitude = i.Latitude,
+                Longitude = i.Longitude,
+                Name = i.Name,
+                PricePerNight = i.PricePerNight,
+                Rating = i.Rating,
+                HotelReviews = i.HotelReviews.ToList()
+            }).FirstOrDefault();
 
-                //return details
-                return new HotelDetailsResponse() { Code = "Success", Hotel = hotel };
-            }
-            catch(Exception ex)
+            if (hotel == null)
             {
-                _logger.LogError(ex, ex.Message);
-                return new HotelDetailsResponse() { Code = "Error", ErrorMessage = "Internal Server Error" };
+                return NotFound();
             }
-            
+
+            return hotel;
         }
     }
 }

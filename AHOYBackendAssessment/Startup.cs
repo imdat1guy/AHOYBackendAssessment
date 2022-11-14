@@ -1,4 +1,5 @@
 using AHOYBackendAssessment.Models;
+using AHOYBackendAssessment.Models.interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -35,6 +36,7 @@ namespace AHOYBackendAssessment
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AHOYBackendAssessment", Version = "v1" });
             });
             services.AddDbContext<HotelCoreDBContext>(options => options.UseSqlServer(Configuration.GetConnectionString("HotelCoreContext")));
+            services.AddScoped<IBookingValidator, BookingValidator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

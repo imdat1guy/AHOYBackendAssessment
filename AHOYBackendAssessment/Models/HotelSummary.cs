@@ -30,6 +30,6 @@ namespace AHOYBackendAssessment.Models
         public double Longitude { get; set; }
         public List<Facility> Facilities { get; set; }
         public float Rating { get; set; }
-        public int NumberOfReviews { get; set; }
+        public List<HotelReview> HotelReviews { get; set; }
     }
 }

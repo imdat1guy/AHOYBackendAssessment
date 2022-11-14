@@ -38,6 +38,9 @@ namespace AHOYBackendAssessment.Migrations
                     b.Property<int>("HotelID")
                         .HasColumnType("int");
 
+                    b.Property<int>("NumberOfRooms")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Timestamp")
                         .HasColumnType("datetime2");
 
@@ -46,7 +49,46 @@ namespace AHOYBackendAssessment.Migrations
 
                     b.HasKey("BookingID");
 
+                    b.HasIndex("HotelID");
+
                     b.ToTable("Bookings");
+                });
+
+            modelBuilder.Entity("AHOYBackendAssessment.Models.Entities.Room", b =>
+                {
+                    b.Property<int>("RoomID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("HotelID")
+                        .HasColumnType("int");
+
+                    b.HasKey("RoomID");
+
+                    b.HasIndex("HotelID");
+
+                    b.ToTable("Rooms");
+                });
+
+            modelBuilder.Entity("AHOYBackendAssessment.Models.Entities.RoomBooking", b =>
+                {
+                    b.Property<int>("RoomBookingID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("BookingID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RoomID")
+                        .HasColumnType("int");
+
+                    b.HasKey("RoomBookingID");
+
+                    b.HasIndex("BookingID");
+
+                    b.ToTable("RoomBookings");
                 });
 
             modelBuilder.Entity("AHOYBackendAssessment.Models.Facility", b =>
@@ -96,9 +138,6 @@ namespace AHOYBackendAssessment.Migrations
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("NumberOfRooms")
-                        .HasColumnType("int");
 
                     b.Property<float>("PricePerNight")
                         .HasColumnType("real");
@@ -157,6 +196,35 @@ namespace AHOYBackendAssessment.Migrations
                     b.ToTable("Image");
                 });
 
+            modelBuilder.Entity("AHOYBackendAssessment.Models.Booking", b =>
+                {
+                    b.HasOne("AHOYBackendAssessment.Models.Hotel", null)
+                        .WithMany("Bookings")
+                        .HasForeignKey("HotelID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("AHOYBackendAssessment.Models.Entities.Room", b =>
+                {
+                    b.HasOne("AHOYBackendAssessment.Models.Hotel", "Hotel")
+                        .WithMany("Rooms")
+                        .HasForeignKey("HotelID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
+                });
+
+            modelBuilder.Entity("AHOYBackendAssessment.Models.Entities.RoomBooking", b =>
+                {
+                    b.HasOne("AHOYBackendAssessment.Models.Booking", null)
+                        .WithMany("RoomBookings")
+                        .HasForeignKey("BookingID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("AHOYBackendAssessment.Models.Facility", b =>
                 {
                     b.HasOne("AHOYBackendAssessment.Models.Hotel", null)
@@ -182,13 +250,22 @@ namespace AHOYBackendAssessment.Migrations
                         .HasForeignKey("HotelID");
                 });
 
+            modelBuilder.Entity("AHOYBackendAssessment.Models.Booking", b =>
+                {
+                    b.Navigation("RoomBookings");
+                });
+
             modelBuilder.Entity("AHOYBackendAssessment.Models.Hotel", b =>
                 {
+                    b.Navigation("Bookings");
+
                     b.Navigation("Facilities");
 
                     b.Navigation("HotelReviews");
 
                     b.Navigation("Images");
+
+                    b.Navigation("Rooms");
                 });
 #pragma warning restore 612, 618
         }
